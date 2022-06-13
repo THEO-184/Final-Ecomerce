@@ -4,6 +4,7 @@ const express = require("express");
 const app = express();
 const morgan = require("morgan");
 const cookieParse = require("cookie-parser");
+const cors = require("cors");
 // routes imports
 const authRouter = require("./routes/authRoutes");
 // middleware imports
@@ -15,6 +16,7 @@ app.use(express.static("./public"));
 app.use(cookieParse(process.env.JWT_SECRET));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cors());
 
 // app.get("/", (req, res) => {
 // 	res.send("e-commerce-api");
