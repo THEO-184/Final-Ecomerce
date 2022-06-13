@@ -11,13 +11,14 @@ const notFoundMiddleware = require("./middleware/not-found");
 const errorHandlerMiddleware = require("./middleware/error-handler");
 
 app.use(morgan("tiny"));
+app.use(express.static("./public"));
 app.use(cookieParse(process.env.JWT_SECRET));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.get("/", (req, res) => {
-	res.send("e-commerce-api");
-});
+// app.get("/", (req, res) => {
+// 	res.send("e-commerce-api");
+// });
 app.get("/api/v1", (req, res) => {
 	console.log(req.signedCookies);
 	res.send("djssjdd");
