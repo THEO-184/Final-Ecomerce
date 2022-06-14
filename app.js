@@ -10,6 +10,10 @@ const userRouter = require("./routes/userRoutes");
 // middleware imports
 const notFoundMiddleware = require("./middleware/not-found");
 const errorHandlerMiddleware = require("./middleware/error-handler");
+const {
+	authMiddleware,
+	authorizePermissions,
+} = require("./middleware/authentication");
 
 app.use(morgan("tiny"));
 app.use(cookieParse(process.env.JWT_SECRET));
@@ -20,7 +24,12 @@ app.get("/", (req, res) => {
 	res.send("e-commerce-api");
 });
 app.use("/api/v1/auth", authRouter);
-app.use("/api/v1/users", userRouter);
+app.use(
+	"/api/v1/users",
+	authMiddleware,
+	authorizePermissions("admin", "owner"),
+	userRouter
+);
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
