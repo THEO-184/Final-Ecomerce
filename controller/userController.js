@@ -1,5 +1,6 @@
-const { NotFoundError, BadRequestError } = require("../errors");
 const { StatusCodes } = require("http-status-codes");
+const bcrypt = require("bcryptjs");
+const { NotFoundError, BadRequestError } = require("../errors");
 
 const User = require("../models/User");
 
@@ -40,12 +41,12 @@ const updateUserPassword = async (req, res) => {
 		throw new NotFoundError("please check your password credentials well");
 	}
 
-	const newUser = await User.findOneAndUpdate(
-		{ _id: req.user.userId },
-		{ password: new_password }
-	);
+	const hashedPassword = await bcrypt.hash(new_password, 10);
 
-	res.status(StatusCodes.OK).json({ newUser });
+	user.password = new_password;
+	await user.save();
+
+	res.status(StatusCodes.OK).json({ success: true, msg: "update successful" });
 };
 
 module.exports = {

@@ -27,7 +27,7 @@ const login = async (req, res) => {
 		throw new NotFoundError("no user with such credentials");
 	}
 
-	const isPasswordMatched = user.comparePassword(user.password);
+	const isPasswordMatched = await user.comparePassword(password);
 	if (!isPasswordMatched) {
 		throw new NotFoundError("no user with such credentials");
 	}
