@@ -20,7 +20,7 @@ app.get("/", (req, res) => {
 	res.send("e-commerce-api");
 });
 app.use("/api/v1/auth", authRouter);
-app.use("/api/v1/user", userRouter);
+app.use("/api/v1/users", userRouter);
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);

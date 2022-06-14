@@ -10,11 +10,9 @@ const {
 } = require("../controller/userController");
 
 router.route("/").get(getAllUsers);
-router
-	.route("/:id")
-	.get(getSingleUser)
-	.get(showCurrentUser)
-	.put(updateUser)
-	.put(updateUserPassword);
+router.route("/showMe").get(showCurrentUser);
+router.route("/updateUser").patch(updateUser);
+router.route("/updatePassword").patch(updateUserPassword);
+router.route("/:id").get(getSingleUser);
 
 module.exports = router;
