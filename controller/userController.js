@@ -1,5 +1,6 @@
 const { NotFoundError, BadRequestError } = require("../errors");
 const { StatusCodes } = require("http-status-codes");
+
 const User = require("../models/User");
 
 const getAllUsers = async (req, res) => {
@@ -28,7 +29,23 @@ const updateUser = async (req, res) => {
 };
 
 const updateUserPassword = async (req, res) => {
-	res.send("update user password");
+	const { old_password, new_password } = req.body;
+	if (!old_password || !new_password) {
+		throw new BadRequestError("please privde all details");
+	}
+	const user = await User.findOne({ _id: req.user.userId });
+
+	const isPasswordMatch = await user.comparePassword(old_password);
+	if (!isPasswordMatch) {
+		throw new NotFoundError("please check your password credentials well");
+	}
+
+	const newUser = await User.findOneAndUpdate(
+		{ _id: req.user.userId },
+		{ password: new_password }
+	);
+
+	res.status(StatusCodes.OK).json({ newUser });
 };
 
 module.exports = {
