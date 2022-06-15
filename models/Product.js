@@ -40,7 +40,7 @@ const ProductSchema = new Schema(
 		},
 		colors: {
 			type: [String],
-			required: true,
+			default: "#222",
 		},
 		featured: {
 			type: Boolean,
@@ -52,7 +52,6 @@ const ProductSchema = new Schema(
 		},
 		inventory: {
 			type: Number,
-			required: true,
 			default: 15,
 		},
 		averageRating: {
