@@ -13,7 +13,6 @@ const productsRouter = require("./routes/productRoutes");
 // middleware imports
 const notFoundMiddleware = require("./middleware/not-found");
 const errorHandlerMiddleware = require("./middleware/error-handler");
-const {} = require("./middleware/authentication");
 
 cloudinary.config({
 	cloud_name: process.env.CLOUD_NAME,
@@ -21,11 +20,11 @@ cloudinary.config({
 	api_secret: process.env.CLOUD_SECRET,
 });
 
+app.use(express.static("./public"));
 app.use(morgan("tiny"));
 app.use(cookieParse(process.env.JWT_SECRET));
 app.use(express.json());
 app.use(fileUpload({ useTempFiles: true }));
-app.use(express.static("./public"));
 app.use(express.urlencoded({ extended: false }));
 
 app.get("/", (req, res) => {

@@ -50,15 +50,19 @@ const deleteProduct = async (req, res) => {
 };
 
 const uploadImage = async (req, res) => {
-	const productImage = req.files.image;
 	if (!req.files) {
 		throw new BadRequestError("upload file");
 	}
+	const productImage = req.files.image;
 
 	if (!productImage.mimetype.startsWith("image")) {
 		throw new BadRequestError("file must be image type");
 	}
-	const productItem = await cloudinary.uploader.upload(
+	const maxSize = 1024 * 1024;
+	if (productImage.size > maxSize) {
+		throw new BadRequestError("image size should be atmost 1KB");
+	}
+	const { secure_url } = await cloudinary.uploader.upload(
 		productImage.tempFilePath,
 		{
 			use_filename: true,
@@ -66,8 +70,7 @@ const uploadImage = async (req, res) => {
 		}
 	);
 	fs.unlinkSync(productImage.tempFilePath);
-	console.log(productImage);
-	res.status().json({ image: productItem });
+	res.status(StatusCodes.CREATED).json({ image: { src: secure_url } });
 };
 
 module.exports = {
