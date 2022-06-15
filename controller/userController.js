@@ -3,7 +3,11 @@ const bcrypt = require("bcryptjs");
 const { NotFoundError, BadRequestError } = require("../errors");
 
 const User = require("../models/User");
-const { createTokenUser, attacheCookieResponse } = require("../utils");
+const {
+	createTokenUser,
+	attacheCookieResponse,
+	checkPermissions,
+} = require("../utils");
 
 const getAllUsers = async (req, res) => {
 	console.log("req", req.user);
@@ -19,6 +23,7 @@ const getSingleUser = async (req, res) => {
 	if (!user) {
 		throw new NotFoundError(`No user with id ${id} found`);
 	}
+	checkPermissions(req.user, user._id);
 	res.status(StatusCodes.OK).json({ success: true, user });
 };
 
