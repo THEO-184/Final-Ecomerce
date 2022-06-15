@@ -4,6 +4,8 @@ const express = require("express");
 const app = express();
 const morgan = require("morgan");
 const cookieParse = require("cookie-parser");
+const fileUpload = require("express-fileupload");
+const cloudinary = require("cloudinary").v2;
 // routes imports
 const authRouter = require("./routes/authRoutes");
 const userRouter = require("./routes/userRoutes");
@@ -11,14 +13,19 @@ const productsRouter = require("./routes/productRoutes");
 // middleware imports
 const notFoundMiddleware = require("./middleware/not-found");
 const errorHandlerMiddleware = require("./middleware/error-handler");
-const {
-	authMiddleware,
-	authorizePermissions,
-} = require("./middleware/authentication");
+const {} = require("./middleware/authentication");
+
+cloudinary.config({
+	cloud_name: process.env.CLOUD_NAME,
+	api_key: process.env.CLOUD_APIKEY,
+	api_secret: process.env.CLOUD_SECRET,
+});
 
 app.use(morgan("tiny"));
 app.use(cookieParse(process.env.JWT_SECRET));
 app.use(express.json());
+app.use(fileUpload({ useTempFiles: true }));
+app.use(express.static("./public"));
 app.use(express.urlencoded({ extended: false }));
 
 app.get("/", (req, res) => {

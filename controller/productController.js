@@ -1,6 +1,8 @@
-const Product = require("../models/Product");
 const { StatusCodes } = require("http-status-codes");
-const { NotFoundError } = require("../errors");
+const cloudinary = require("cloudinary").v2;
+const fs = require("fs");
+const Product = require("../models/Product");
+const { NotFoundError, BadRequestError } = require("../errors");
 
 const createProduct = async (req, res) => {
 	req.body.user = req.user.userId;
@@ -48,7 +50,24 @@ const deleteProduct = async (req, res) => {
 };
 
 const uploadImage = async (req, res) => {
-	res.send("upload image");
+	const productImage = req.files.image;
+	if (!req.files) {
+		throw new BadRequestError("upload file");
+	}
+
+	if (!productImage.mimetype.startsWith("image")) {
+		throw new BadRequestError("file must be image type");
+	}
+	const productItem = await cloudinary.uploader.upload(
+		productImage.tempFilePath,
+		{
+			use_filename: true,
+			folder: "ecommerce",
+		}
+	);
+	fs.unlinkSync(productImage.tempFilePath);
+	console.log(productImage);
+	res.status().json({ image: productItem });
 };
 
 module.exports = {
