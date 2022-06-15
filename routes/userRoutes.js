@@ -16,7 +16,7 @@ router
 	.route("/")
 	.get(authMiddleware, authorizePermissions("admin"), getAllUsers);
 router.route("/showMe").get(authMiddleware, showCurrentUser);
-router.route("/updateUser").patch(updateUser);
+router.route("/updateUser").patch(authMiddleware, updateUser);
 router.route("/updatePassword").patch(authMiddleware, updateUserPassword);
 router.route("/:id").get(authMiddleware, getSingleUser);
 

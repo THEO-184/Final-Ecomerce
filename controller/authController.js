@@ -1,7 +1,11 @@
 const User = require("../models/User");
 const { StatusCodes } = require("http-status-codes");
 const { BadRequestError, NotFoundError } = require("../errors");
-const { createJWT, attacheCookieResponse } = require("../utils");
+const {
+	createJWT,
+	attacheCookieResponse,
+	createTokenUser,
+} = require("../utils");
 
 const register = async (req, res) => {
 	const { email, password, name } = req.body;
@@ -11,7 +15,7 @@ const register = async (req, res) => {
 		throw new BadRequestError("user already exists");
 	}
 	const user = await User.create({ email, password, name });
-	const tokenPayload = { name: user.name, userId: user._id, role: user.role };
+	const tokenPayload = createTokenUser(user);
 	attacheCookieResponse({ res, tokenPayload });
 	res.status(StatusCodes.CREATED).json({ user });
 };
@@ -32,7 +36,7 @@ const login = async (req, res) => {
 		throw new NotFoundError("no user with such credentials");
 	}
 
-	const tokenPayload = { name: user.name, userId: user._id, role: user.role };
+	const tokenPayload = createTokenUser(user);
 	attacheCookieResponse({ res, tokenPayload });
 	res.status(StatusCodes.OK).json({ user });
 };

@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const { NotFoundError, BadRequestError } = require("../errors");
 
 const User = require("../models/User");
+const { createTokenUser, attacheCookieResponse } = require("../utils");
 
 const getAllUsers = async (req, res) => {
 	console.log("req", req.user);
@@ -26,7 +27,29 @@ const showCurrentUser = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
-	res.send("update user");
+	const {
+		body: { name, email },
+		user: { userId },
+	} = req;
+	const updateObj = {};
+	if (!name && !email) {
+		throw new BadRequestError("provide user detail you want to update");
+	}
+	if (name) {
+		updateObj.name = name;
+	}
+	if (email) {
+		updateObj.email = email;
+	}
+	const user = await User.findOneAndUpdate({ userId }, updateObj, {
+		new: true,
+		runValidators: true,
+	}).select("-password -__v");
+
+	const tokenPayload = createTokenUser(user);
+	attacheCookieResponse({ res, tokenPayload });
+
+	res.status(StatusCodes.OK).json({ success: true, user });
 };
 
 const updateUserPassword = async (req, res) => {
@@ -40,8 +63,6 @@ const updateUserPassword = async (req, res) => {
 	if (!isPasswordMatch) {
 		throw new NotFoundError("please check your password credentials well");
 	}
-
-	const hashedPassword = await bcrypt.hash(new_password, 10);
 
 	user.password = new_password;
 	await user.save();
