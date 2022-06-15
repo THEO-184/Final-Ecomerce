@@ -16,7 +16,7 @@ const ReviewSchema = new Schema(
 			required: [true, "atmost hundred characters expected"],
 			maxlength: 100,
 		},
-		Comment: {
+		comment: {
 			type: String,
 			required: [true, "please provide comment on product"],
 		},
