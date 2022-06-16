@@ -6,6 +6,8 @@ const morgan = require("morgan");
 const cookieParse = require("cookie-parser");
 const fileUpload = require("express-fileupload");
 const cloudinary = require("cloudinary").v2;
+const bodyParser = require("body-parser");
+
 // routes imports
 const authRouter = require("./routes/authRoutes");
 const userRouter = require("./routes/userRoutes");
@@ -24,9 +26,9 @@ cloudinary.config({
 app.use(express.static("./public"));
 app.use(morgan("tiny"));
 app.use(cookieParse(process.env.JWT_SECRET));
-app.use(express.json());
+app.use(bodyParser.json());
 app.use(fileUpload({ useTempFiles: true }));
-app.use(express.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: false }));
 
 app.get("/", (req, res) => {
 	res.send("e-commerce-api");

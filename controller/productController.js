@@ -1,11 +1,34 @@
 const { StatusCodes } = require("http-status-codes");
 const cloudinary = require("cloudinary").v2;
+
 const fs = require("fs");
 const Product = require("../models/Product");
 const { NotFoundError, BadRequestError } = require("../errors");
 
 const createProduct = async (req, res) => {
 	req.body.user = req.user.userId;
+	// handle Image first
+	if (!req.files) {
+		throw new BadRequestError("upload file");
+	}
+	const productImage = req.files.image;
+
+	if (!productImage.mimetype.startsWith("image")) {
+		throw new BadRequestError("file must be image type");
+	}
+	const maxSize = 1024 * 1024;
+	if (productImage.size > maxSize) {
+		throw new BadRequestError("image size should be atmost 1KB");
+	}
+	const { secure_url } = await cloudinary.uploader.upload(
+		productImage.tempFilePath,
+		{
+			use_filename: true,
+			folder: "ecommerce",
+		}
+	);
+	fs.unlinkSync(productImage.tempFilePath);
+	req.body.image = secure_url;
 	const product = await Product.create(req.body);
 	res.status(StatusCodes.CREATED).json({ success: true, product });
 };
