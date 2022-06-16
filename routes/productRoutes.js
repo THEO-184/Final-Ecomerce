@@ -10,6 +10,7 @@ const {
 	deleteProduct,
 	uploadImage,
 } = require("../controller/productController");
+const { getSingleProductReviews } = require("../controller/reviewController");
 
 const storage = multer.diskStorage({
 	destination: (req, file, cb) => {
@@ -40,4 +41,5 @@ router
 	.route("/uploadImage")
 	.post([authMiddleware, authorizePermissions("admin")], uploadImage);
 
+router.route("/:id/reviews").get(getSingleProductReviews);
 module.exports = router;
