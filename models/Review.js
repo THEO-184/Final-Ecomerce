@@ -34,6 +34,21 @@ const ReviewSchema = new Schema(
 	{ timestamps: true }
 );
 
+ReviewSchema.statics.calculateAvgRating = async function (productId) {
+	console.log(productId);
+};
+
+// user can make only one review on a product
 ReviewSchema.index({ user: 1, product: 1 }, { unique: true });
+
+// calculate new avg rating when user update his review
+ReviewSchema.post("save", async function () {
+	await this.constructor.calculateAvgRating(this.product);
+});
+
+// calculate new avg rating when user delete review
+ReviewSchema.post("remove", async function () {
+	await this.constructor.calculateAvgRating(this.product);
+});
 
 module.exports = model("Review", ReviewSchema);

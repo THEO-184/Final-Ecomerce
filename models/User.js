@@ -31,6 +31,18 @@ const UserSchema = new Schema({
 		enum: ["admin", "user"],
 		default: "user",
 	},
+	verificationToken: String,
+	isVerified: {
+		type: Boolean,
+		default: false,
+	},
+	verified: Date,
+	passwordToken: {
+		type: String,
+	},
+	passwordTokenExpiryDate: {
+		type: Date,
+	},
 });
 
 UserSchema.pre("save", async function (next) {
