@@ -34,19 +34,34 @@ const ReviewSchema = new Schema(
 	{ timestamps: true }
 );
 
+// get access to all reveiew collections and calculate average rating
+
 ReviewSchema.statics.calculateAvgRating = async function (productId) {
-	console.log(productId);
+	const result = await this.aggregate([
+		{ $match: { product: productId } },
+
+		{ $project: { _id: 0, rating: 1 } },
+		{
+			$group: {
+				_id: null,
+				averageRating: { $avg: "$rating" },
+				numOfReviews: { $sum: 1 },
+			},
+		},
+	]);
+	await this.model("Product").findOneAndUpdate(
+		{ _id: productId },
+		{
+			averageRating: result[0]?.averageRating || 0,
+			numOfReviews: result[0]?.numOfReviews || 0,
+		}
+	);
 };
 
-// user can make only one review on a product
-ReviewSchema.index({ user: 1, product: 1 }, { unique: true });
-
-// calculate new avg rating when user update his review
 ReviewSchema.post("save", async function () {
 	await this.constructor.calculateAvgRating(this.product);
 });
 
-// calculate new avg rating when user delete review
 ReviewSchema.post("remove", async function () {
 	await this.constructor.calculateAvgRating(this.product);
 });
