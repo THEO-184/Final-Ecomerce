@@ -7,6 +7,12 @@ const cookieParse = require("cookie-parser");
 const fileUpload = require("express-fileupload");
 const cloudinary = require("cloudinary").v2;
 const bodyParser = require("body-parser");
+// security packages
+const rateLimiter = require("express-rate-limit");
+const helmet = require("helmet");
+const cors = require("cors");
+const xss = require("xss-clean");
+const mongooseSanitize = require("express-mongo-sanitize");
 
 // routes imports
 const authRouter = require("./routes/authRoutes");
@@ -25,6 +31,16 @@ cloudinary.config({
 });
 
 app.use(express.static("./public"));
+app.use(
+	rateLimiter({
+		windowMs: 15 * 60 * 100,
+		max: 60,
+	})
+);
+app.use(cors());
+app.use(helmet());
+app.use(xss());
+app.use(mongooseSanitize());
 app.use(morgan("tiny"));
 app.use(cookieParse(process.env.JWT_SECRET));
 app.use(bodyParser.json());
